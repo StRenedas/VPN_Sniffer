@@ -1,9 +1,5 @@
 version: '3.7'
 
-networks:
-  my-network:
-    driver: bridge
-
 services:
   clickhouse:
     image: bitnami/clickhouse:latest
@@ -16,15 +12,10 @@ services:
       - ALLOW_EMPTY_PASSWORD=no
       - CLICKHOUSE_ADMIN_USER=${CLICKHOUSE_USER}
       - CLICKHOUSE_ADMIN_PASSWORD=${CLICKHOUSE_PASSWORD}
-    networks:
-      - my-network
     volumes:
-      - ./clickhouse/init.sh:/docker-entrypoint-initdb.d/init.sh
+      - ./db/init.sh:/docker-entrypoint-initdb.d/init.sh
   myapp:
     build: .
-    command: python main.py
-    networks:
-      - my-network
     depends_on:
       - clickhouse
     restart: on-failure

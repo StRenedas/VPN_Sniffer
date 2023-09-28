@@ -1,27 +1,50 @@
-from os import getenv
+import datetime
+import pprint
+
 from dotenv import load_dotenv
-from clickhouse import connection
+from db.connection import ClickhouseDB
+from generators.FakeDataGenerator import FakeDataGenerator
 from asyncio import sleep, run
-from clickhouse_driver import Client
 import checks
 
 load_dotenv()
 
-client = Client(host=getenv('CLICKHOUSE_HOST'),
-                port=getenv('CLICKHOUSE_PORT'),
-                user=getenv('CLICKHOUSE_USER'),
-                password=getenv('CLICKHOUSE_PASSWORD'))
+DB_connection = ClickhouseDB()
+fake_data_generator = FakeDataGenerator()
 
 
-async def start_analysis(click_client):
-    connection.insert_data_to_vpn(10000, click_client)
-    last_connections = connection.select_data_from_vpn(click_client)
-    hashed_connections = checks.hash_connections(last_connections)
-    connection.insert_data_into_anomaly(hashed_connections, click_client)
-    await sleep(10)
-    print('looped')
+async def start_analysis():
+    min_time = datetime.datetime.min
+    while True:
+        try:
+            fake_rows = fake_data_generator.generate_fake_logins(10)
+
+            DB_connection.insert_data_to_vpn(fake_rows)
+
+            await sleep(10)
+
+            fake_rows = fake_data_generator.generate_fake_logins(10)
+
+            DB_connection.insert_data_to_vpn(fake_rows)
+
+            await sleep(5)
+            
+            last_connections = DB_connection.select_data_from_vpn(min_time)
+            min_time = datetime.datetime.now()
+
+            connections_dict = checks.connections_to_dict(last_connections)
+
+            anomalies = checks.prep_anomalies(connections_dict)
+
+            DB_connection.insert_data_into_anomaly(anomalies)
+
+            print('Anomalies found:')
+            pprint.pprint(anomalies)
+            await sleep(30)
+
+        except Exception as ex:
+            print(ex)
 
 
 if __name__ == '__main__':
-    while True:
-        run(start_analysis(client))
+    run(start_analysis())
