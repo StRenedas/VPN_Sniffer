@@ -16,6 +16,10 @@ services:
       - ./db/init.sh:/docker-entrypoint-initdb.d/init.sh
   sniffer:
     build: .
+    env_file:
+      - .env.docker
+    ports:
+      - "8888:8888"
     depends_on:
       - clickhouse
     restart: on-failure

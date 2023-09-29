@@ -6,6 +6,16 @@ class AnomalyDetector:
     AVG_SPEED_PER_SECOND = 926 / 3600
     EARTH_RADIUS = 6371
 
+    @staticmethod
+    def connections_to_dict(connections: list) -> dict:
+        connections_map = {}
+        for connection in connections:
+            if connection[1] not in connections_map:
+                connections_map[connection[1]] = [(connection[0], *connection[3:6])]
+            else:
+                connections_map[connection[1]] += [(connection[0], *connection[3:6])]
+        return connections_map
+
     def __calculate_distance(self, latitude_a: float, latitude_b: float, longitude_a: float,
                              longitude_b: float) -> float:
         cos_d = sin(latitude_a) * sin(latitude_b) + cos(latitude_a) * cos(latitude_b) * cos(longitude_a - longitude_b)
@@ -25,13 +35,3 @@ class AnomalyDetector:
 
     def collect_anomalies(self, last_connections: dict) -> list:
         return [(uuid4(), values[0][0], user) for user, values in last_connections.items() if self.__is_anomaly(values)]
-
-    @staticmethod
-    def connections_to_dict(connections: list) -> dict:
-        connections_map = {}
-        for data in connections:
-            if data[1] not in connections_map:
-                connections_map[data[1]] = [(data[0], *data[3:6])]
-            else:
-                connections_map[data[1]] += [(data[0], *data[3:6])]
-        return connections_map
