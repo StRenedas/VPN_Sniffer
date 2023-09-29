@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-clickhouse-client --user "$CLICKHOUSE_USER" --password "$CLICKHOUSE_PASSWORD" -n <<-EOSQL
+clickhouse-client --user "$CLICKHOUSE_ADMIN_USER" --password "$CLICKHOUSE_ADMIN_PASSWORD" -n <<-EOSQL
   CREATE TABLE VPN (
       id        UUID NOT NULL PRIMARY KEY,
       username  String,

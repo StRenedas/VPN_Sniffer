@@ -11,8 +11,8 @@ class ClickhouseDB:
     def __init__(self):
         self.client = Client(host=getenv('CLICKHOUSE_HOST'),
                              port=getenv('CLICKHOUSE_PORT'),
-                             user=getenv('CLICKHOUSE_USER'),
-                             password=getenv('CLICKHOUSE_PASSWORD'))
+                             user=getenv('CLICKHOUSE_ADMIN_USER'),
+                             password=getenv('CLICKHOUSE_ADMIN_PASSWORD'))
         self.__timestamp = datetime.min
 
     def insert_data_to_vpn(self, fake_rows):

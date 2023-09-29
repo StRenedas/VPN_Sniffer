@@ -7,10 +7,13 @@
 
 - Python 3.10
 - ClickHouse 23
-- Docker
-- Docker Compose
+- Docker 24.0.6
+- Docker Compose 2.21.0
 - clickhouse-driver 0.2.6
 - python-dotenv 1.0.0
+- fastapi 0.103.1
+- fastapi-utils 0.2.1
+- uvicorn 0.23.2
 
 ## Запуск сервиса
 
@@ -20,11 +23,12 @@
 docker-compose up -d
 ```
 
-Логи работы сервиса выведены в stdout и доступны с использованием команды
+## API
 
-```bash
-docker logs
-```
+`GET localhost:8888/generate` - генерирует 10000 фейковых записей в таблицу подключений.  
+`GET localhost:8888/anomalies` - отдает список найденных на текущий момент аномалий.  
+`GET localhost:8888/` - служебный роут для проверки работоспособности сервера.
 
 Для внешнего подключения к БД использовать адрес ```localhost:8123```  
 и имя пользователя/пароль из файла .env.docker
+
